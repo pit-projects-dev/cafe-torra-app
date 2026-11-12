@@ -31,14 +31,48 @@ function toggleCarrinho() {
 function adicionar(id) {
     const p = produtos.find(item => item.id === id);
     carrinho.push(p);
-    document.getElementById("contador-carrinho").innerText = carrinho.length;
+    atualizarCarrinho();
     toggleCarrinho();
 }
 
+function atualizarCarrinho() {
+    const itensContainer = document.getElementById("drawer-items");
+    const contador = document.getElementById("contador-carrinho");
+    
+    if (contador) contador.innerText = carrinho.length;
+    if (!itensContainer) return;
+
+    itensContainer.innerHTML = "";
+    let subtotal = 0;
+
+    carrinho.forEach(item => {
+        subtotal += item.preco;
+        const div = document.createElement("div");
+        div.style.cssText = "display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px solid #eee; padding-bottom: 5px;";
+        div.innerHTML = `
+            <span>${item.nome}</span>
+            <span>R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
+        `;
+        itensContainer.appendChild(div);
+    });
+
+    const frete = 15.00;
+    const total = subtotal > 0 ? subtotal + frete : 0;
+
+    const valTotalEl = document.getElementById("val-total");
+    if (valTotalEl) {
+        valTotalEl.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    }
+}
+
 function finalizarCheckout() {
+    if (carrinho.length === 0) {
+        alert("Seu carrinho está vazio!");
+        return;
+    }
     alert("Pedido finalizado com sucesso!");
     carrinho = [];
-    document.getElementById("contador-carrinho").innerText = 0;
+    atualizarCarrinho();
     toggleCarrinho();
 }
 
